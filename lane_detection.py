@@ -18,7 +18,7 @@ def thresholding_pipeline(img, s_thresh=(90, 255), sxy_thresh=(20, 100)):
 
     img = np.copy(img)
     # 1: Convert to HSV color space and separate the V channel
-    hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
+    hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float32)
     h_channel = hls[:, :, 0]
     l_channel = hls[:, :, 1]
     s_channel = hls[:, :, 2]
@@ -59,12 +59,12 @@ def sliding_windows(binary_warped, nwindows=9):
 
     # Find the peak of the left and right halves of the histogram
     # These will be the starting point for the left and right lines
-    midpoint = np.int(histogram.shape[0]/2)
+    midpoint = np.int32(histogram.shape[0]/2)
     leftx_base = np.argmax(histogram[:midpoint])
     rightx_base = np.argmax(histogram[midpoint:]) + midpoint
 
     # Set height of windows
-    window_height = np.int(binary_warped.shape[0]/nwindows)
+    window_height = np.int32(binary_warped.shape[0]/nwindows)
     # Identify the x and y positions of all nonzero pixels in the image
     nonzero = binary_warped.nonzero()
     nonzeroy = np.array(nonzero[0])
@@ -97,9 +97,9 @@ def sliding_windows(binary_warped, nwindows=9):
         right_lane_inds.append(good_right_inds)
         # If you found > minpix pixels, recenter next window on their mean position
         if len(good_left_inds) > minpix:
-            leftx_current = np.int(np.mean(nonzerox[good_left_inds]))
+            leftx_current = np.int32(np.mean(nonzerox[good_left_inds]))
         if len(good_right_inds) > minpix:
-            rightx_current = np.int(np.mean(nonzerox[good_right_inds]))
+            rightx_current = np.int32(np.mean(nonzerox[good_right_inds]))
 
     # Concatenate the arrays of indices
     left_lane_inds = np.concatenate(left_lane_inds)
@@ -184,8 +184,11 @@ if __name__ == '__main__':
     frames_counts = 1
     if video_index == 0:
         cap=cv2.VideoCapture('project_video.mp4')  
-    else:
+    elif video_index == 1:
         cap=cv2.VideoCapture('fog_video.mp4') 
+    else:
+        cap=cv2.VideoCapture('cars-downsampled.mp4') 
+    
 
     class MyThread(Thread):
         def __init__(self, q):
@@ -214,13 +217,13 @@ if __name__ == '__main__':
             # Add the lane image on the original frame if started
             if started:
                 frame = cv2.addWeighted(frame, 1, road, 0.5, 0)
-            cv2.imshow("RealTime_lane_detection",frame)  
+                cv2.imshow("RealTime_lane_detection",frame)  
             if cv2.waitKey(1)&0xFF==ord('q'):  
                 break  
             frames_counts+=1
             cv2.waitKey(12)
             finish=time.time()
-            print('FPS:  ' + str(int(1/(finish-start)))) 
+            # print('FPS:  ' + str(int(1/(finish-start)))) 
 
     cap.release()  
     cv2.destroyAllWindows() 
