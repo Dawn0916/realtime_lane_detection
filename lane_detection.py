@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import time
 from threading import Thread
-from Queue import Queue
+from queue import Queue
 
 # defualt video number, if you want to process the "fog_video.mp4", change video_index to 1
 video_index = 0
@@ -188,16 +188,15 @@ if __name__ == '__main__':
         cap=cv2.VideoCapture('fog_video.mp4') 
 
     class MyThread(Thread):
-
         def __init__(self, q):
             Thread.__init__(self)
-	    self.q = q
+            self.q = q
 
-	def run(self):
-	    while(1):
-	        if (not self.q.empty()):
-         	    image = self.q.get()
-		    main_pipeline(image)
+        def run(self):
+            while(1):
+                if (not self.q.empty()):
+                    image = self.q.get()
+                    main_pipeline(image)
 
     q = Queue()
     q.queue.clear()
@@ -206,12 +205,11 @@ if __name__ == '__main__':
     thd1.start()
 
     while (True):  
-	    start=time.time()
+            start=time.time()
             ret,frame=cap.read()
-
             # Detect the lane every 5 frames
-	    if frames_counts % 5 == 0:
-	        q.put(frame)
+            if frames_counts % 5 == 0:
+                q.put(frame)
 
             # Add the lane image on the original frame if started
             if started:
@@ -220,9 +218,9 @@ if __name__ == '__main__':
             if cv2.waitKey(1)&0xFF==ord('q'):  
                 break  
             frames_counts+=1
-	    cv2.waitKey(12)
+            cv2.waitKey(12)
             finish=time.time()
-            print 'FPS:  ' + str(int(1/(finish-start)))
+            print('FPS:  ' + str(int(1/(finish-start)))) 
 
     cap.release()  
     cv2.destroyAllWindows() 
